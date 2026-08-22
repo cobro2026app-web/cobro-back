@@ -16,7 +16,7 @@ import { Type } from 'class-transformer';
 export class CrearPrestamoDto {
 
   @IsUUID()
-  usuarioId!: string;
+  clienteId!: string;
 
   @IsNumber(
     {

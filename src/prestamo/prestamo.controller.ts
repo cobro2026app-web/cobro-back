@@ -12,7 +12,6 @@ export class PrestamoController {
   constructor(private readonly prestamoService: PrestamoService) { }
 
   @Post()
-  @Post()
   @UseGuards(
     JwtAuthGuard,
     PermissionsGuard,

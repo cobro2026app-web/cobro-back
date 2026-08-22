@@ -11,6 +11,7 @@ import { ClienteModule } from './cliente/cliente.module';
 import { ConfiPrestamoModule } from './confi-prestamo/confi-prestamo.module';
 import { PrestamoModule } from './prestamo/prestamo.module';
 import { PagosModule } from './pagos/pagos.module';
+import { RutaModule } from './ruta/ruta.module';
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { PagosModule } from './pagos/pagos.module';
     ClienteModule,
     ConfiPrestamoModule,
     PrestamoModule,
-    PagosModule
+    PagosModule,
+    RutaModule
 
   ],
 })

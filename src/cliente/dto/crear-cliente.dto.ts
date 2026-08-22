@@ -40,4 +40,8 @@ export class CrearClienteDto {
   @IsString()
   @IsOptional()
   descripcionDireccion?: string;
+
+  @IsString()
+  @IsOptional()
+  rutaId?: string;
 }

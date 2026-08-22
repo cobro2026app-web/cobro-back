@@ -49,6 +49,12 @@ export class Cliente {
     descripcionDireccion!: string;
 
     @Column({
+  type: 'varchar',
+  length: 36,
+  nullable: true,
+})
+rutaId!: string | null;
+    @Column({
         default: 'ACTIVO',
     })
     estado!: string;

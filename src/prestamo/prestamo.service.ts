@@ -39,7 +39,7 @@ export class PrestamoService {
           Cliente,
           {
             where: {
-              id: dto.usuarioId,
+              id: dto.clienteId,
             },
           },
         );
@@ -108,7 +108,7 @@ export class PrestamoService {
           manager.create(
             Prestamo,
             {
-              usuarioId: dto.usuarioId,
+              clienteId: dto.clienteId,
               montoInteres: dto.montoInteres,
               valorCuota: dto.valorCuota,
               creadoPorId,
@@ -154,7 +154,7 @@ export class PrestamoService {
             dto.fechas?.map((fecha) => ({
               prestamoId: prestamoGuardado.id,
               numero: fecha.numero,
-              fechaPago:  this.parseDateOnly(fecha.fechaPago),
+              fechaPago: this.parseDateOnly(fecha.fechaPago),
               valor: fecha.valor,
             })) ?? [],
           );
@@ -183,13 +183,26 @@ export class PrestamoService {
           },
           relations: {
             fechasPago: true,
+            cliente:true
+          },
+          select:{
+            cliente:{
+              id:true,
+              nombres:true,
+              apellidos:true,
+              cedula:true,
+            }
           },
           order: {
             createdAt: 'DESC',
           },
         });
 
-      return prestamos;
+      return {
+        exito: true,
+        msg: "Operación exitosa",
+        data: prestamos
+      };
 
     } catch (error) {
 

@@ -35,11 +35,11 @@ export class Prestamo {
    * Cliente al que pertenece el préstamo.
    */
   @Column({
-    name: 'usuario_id',
+    name: 'cliente_id',
     type: 'char',
     length: 36,
   })
-  usuarioId!: string;
+  clienteId!: string;
 
   @ManyToOne(
     () => Cliente,
@@ -48,9 +48,9 @@ export class Prestamo {
     },
   )
   @JoinColumn({
-    name: 'usuario_id',
+    name: 'cliente_id',
   })
-  usuario!: Usuario;
+  cliente!: Cliente;
 
   /**
    * Usuario que creó el préstamo.

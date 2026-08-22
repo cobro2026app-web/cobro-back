@@ -12,7 +12,6 @@ import { Repository } from 'typeorm';
 import { Cliente } from './entities/cliente.entity';
 
 import { CrearClienteDto } from './dto/crear-cliente.dto';
-import { log } from 'node:console';
 import { EstadoUsuario, Usuario } from 'src/usuario/entities/usuario.entity';
 
 @Injectable()
@@ -88,6 +87,7 @@ export class ClienteService {
           cedula: dto.cedula,
           telefono: dto.telefono,
           whatsapp: dto.whatsapp,
+          rutaId:dto.rutaId,
           direccion: dto.direccion,
           descripcionDireccion:
             dto.descripcionDireccion,
@@ -128,6 +128,7 @@ export class ClienteService {
       },
       relations: {
         rol: true,
+        
       },
     });
 
@@ -170,6 +171,8 @@ export class ClienteService {
         },
       });
 
+      console.log(clientes);
+      
     return {
       exito: true,
       msg: "Operación exitosa.",
@@ -184,6 +187,7 @@ export class ClienteService {
         descripcionDireccion:
           cliente.descripcionDireccion,
         estado: cliente.estado,
+        rutaId:cliente.rutaId
       }))
     };
   }
