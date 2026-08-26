@@ -1,7 +1,9 @@
+import { Prestamo } from 'src/prestamo/entities/prestamo.entity';
 import {
     Column,
     CreateDateColumn,
     Entity,
+    OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
@@ -71,5 +73,12 @@ rutaId!: string | null;
     @UpdateDateColumn()
     updatedAt!: Date;
 
-
+  /**
+   * Préstamos asociados al cliente.
+   */
+  @OneToMany(
+    () => Prestamo,
+    (prestamo) => prestamo.cliente,
+  )
+  prestamos!: Prestamo[];
 }

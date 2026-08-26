@@ -81,6 +81,11 @@ export class Prestamo {
     type: 'int',
   })
   monto!: number;
+  
+  @Column({
+    type: 'int',
+  })
+  deudaActual!: number;
 
   @Column({
     type: 'int',

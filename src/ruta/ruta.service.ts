@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -11,6 +12,8 @@ import { Usuario } from 'src/usuario/entities/usuario.entity';
 import { Cliente } from 'src/cliente/entities/cliente.entity';
 import { CrearRutaDto } from './dto/create-ruta.dto';
 import { log } from 'node:console';
+import { ActualizarRutaDto } from './dto/update-ruta.dto';
+import { EstadoPrestamo } from 'src/prestamo/entities/prestamo.entity';
 
 
 @Injectable()
@@ -111,7 +114,7 @@ export class RutaService {
     const resultado = await Promise.all(
       rutas.map(async (ruta) => {
 
-        let cobrador = null;
+        let cobrador;
 
         if (ruta.cobradorId) {
           console.log('4. BUSCANDO COBRADOR', ruta.cobradorId);
@@ -121,6 +124,13 @@ export class RutaService {
               id: ruta.cobradorId,
             },
           });
+
+          cobrador = {
+
+            id: usuario?.id,
+            nombre: usuario?.nombre,
+            apellido: usuario?.apellido,
+          };
 
 
         }
@@ -158,4 +168,135 @@ export class RutaService {
       data: resultado,
     };
   }
+
+
+  async editarRuta(
+    id: string,
+    dto: ActualizarRutaDto,
+  ) {
+    const ruta = await this.rutaRepository.findOne({
+      where: { id },
+    });
+
+    if (!ruta) {
+      throw new NotFoundException('La ruta no existe');
+    }
+
+    if (dto.cobradorId !== undefined) {
+      const cobrador = await this.usuarioRepository.findOne({
+        where: {
+          id: dto.cobradorId,
+        },
+        relations: {
+          rol: true,
+        },
+      });
+
+      if (!cobrador) {
+        throw new NotFoundException(
+          'El cobrador no existe',
+        );
+      }
+
+      if (cobrador.rol.codigo !== 'COBRADOR') {
+        throw new BadRequestException(
+          'El usuario seleccionado no es un cobrador',
+        );
+      }
+
+      const rutaAsignada =
+        await this.rutaRepository.findOne({
+          where: {
+            cobradorId: dto.cobradorId,
+          },
+        });
+
+      if (
+        rutaAsignada &&
+        rutaAsignada.id !== id
+      ) {
+        throw new ConflictException(
+          'El cobrador ya tiene una ruta asignada',
+        );
+      }
+    }
+
+    if (dto.nombre !== undefined) {
+      ruta.nombre = dto.nombre;
+    }
+
+    if (dto.descripcion !== undefined) {
+      ruta.descripcion = dto.descripcion;
+    }
+
+    if (dto.cobradorId !== undefined) {
+      ruta.cobradorId = dto.cobradorId;
+    }
+
+    if (dto.habilitada !== undefined) {
+      ruta.habilitada = dto.habilitada;
+    }
+
+    await this.rutaRepository.save(ruta);
+
+    return {
+      exito: true,
+      msg: 'Operación exitosa.',
+      data: {},
+    };
+  }
+
+  async listarClientesRutas(idRuta: string) {
+
+    try {
+      const clientes = await this.clienteRepository
+        .createQueryBuilder('cliente')
+        .leftJoinAndSelect(
+          'cliente.prestamos',
+          'prestamo',
+          'prestamo.estado = :estado',
+          {
+            estado: EstadoPrestamo.ACTIVO,
+          },
+        )
+        .where('cliente.rutaId = :idRuta', {
+          idRuta,
+        })
+        .select([
+          'cliente.id',
+          'cliente.nombres',
+          'cliente.apellidos',
+          'cliente.cedula',
+          'cliente.estado',
+          'cliente.telefono',
+
+          'prestamo.deudaActual',
+        ])
+        .getMany();
+
+      const data = clientes.map((cliente) => ({
+        cliente: {
+          id: cliente.id,
+          nombres: cliente.nombres,
+          apellidos: cliente.apellidos,
+          cedula: cliente.cedula,
+          telefono: cliente.telefono,
+          estado: cliente.estado,
+        },
+        deudaActual: cliente.prestamos.reduce(
+          (total, prestamo) => total + Number(prestamo.deudaActual || 0),
+          0,
+        ),
+      }));
+
+      return {
+        exito: true,
+        msg: 'Operación exitosa.',
+        data,
+      };
+    } catch (error) {
+
+    }
+  }
+
 }

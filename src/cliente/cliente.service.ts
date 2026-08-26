@@ -13,6 +13,7 @@ import { Cliente } from './entities/cliente.entity';
 
 import { CrearClienteDto } from './dto/crear-cliente.dto';
 import { EstadoUsuario, Usuario } from 'src/usuario/entities/usuario.entity';
+import { EstadoPrestamo } from 'src/prestamo/entities/prestamo.entity';
 
 @Injectable()
 export class ClienteService {
@@ -48,6 +49,7 @@ export class ClienteService {
       const usuario = await this.usuarioRepository.findOne({
         where: {
           id: usuarioId,
+
         },
         relations: {
           rol: true,
@@ -87,7 +89,7 @@ export class ClienteService {
           cedula: dto.cedula,
           telefono: dto.telefono,
           whatsapp: dto.whatsapp,
-          rutaId:dto.rutaId,
+          rutaId: dto.rutaId,
           direccion: dto.direccion,
           descripcionDireccion:
             dto.descripcionDireccion,
@@ -128,7 +130,7 @@ export class ClienteService {
       },
       relations: {
         rol: true,
-        
+
       },
     });
 
@@ -161,18 +163,47 @@ export class ClienteService {
       );
     }
 
-    const clientes =
-      await this.clienteRepository.find({
-        where: {
-          createdById: adminId,
+    const clientes = await this.clienteRepository
+      .createQueryBuilder('cliente')
+      .leftJoin(
+        'cliente.prestamos',
+        'prestamo',
+        'prestamo.estado = :estado',
+        {
+          estado: EstadoPrestamo.ACTIVO,
         },
-        order: {
-          nombres: 'ASC',
-        },
-      });
+      )
+      .leftJoinAndSelect(
+        'prestamo.fechasPago',
+        'fechaPago',
+      )
+      .where('cliente.createdById = :adminId', {
+        adminId,
+      })
+      .select([
+        'cliente.id',
+        'cliente.nombres',
+        'cliente.apellidos',
+        'cliente.cedula',
+        'cliente.telefono',
+        'cliente.whatsapp',
+        'cliente.direccion',
+        'cliente.descripcionDireccion',
+        'cliente.estado',
+        'cliente.rutaId',
 
-      console.log(clientes);
-      
+        'prestamo.id',
+        'prestamo.totalPagar',
+        'prestamo.frecuencia',
+        'prestamo.deudaActual',
+
+        'fechaPago.id',
+        'fechaPago.fechaPago',
+        'fechaPago.numero',
+      ])
+      .orderBy('cliente.nombres', 'ASC')
+      .getMany();
+
     return {
       exito: true,
       msg: "Operación exitosa.",
@@ -187,7 +218,11 @@ export class ClienteService {
         descripcionDireccion:
           cliente.descripcionDireccion,
         estado: cliente.estado,
-        rutaId:cliente.rutaId
+        rutaId: cliente.rutaId,
+        totalPrestado: cliente.prestamos.reduce(
+          (total, prestamo) => total + prestamo.deudaActual,
+          0,
+        ),
       }))
     };
   }

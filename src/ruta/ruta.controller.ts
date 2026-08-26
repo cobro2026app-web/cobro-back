@@ -4,6 +4,7 @@ import { CrearRutaDto } from './dto/create-ruta.dto';
 import { JwtAuthGuard } from 'src/core/guard/jwt-auth.guard';
 import { PermissionsGuard } from 'src/core/guard/permissions.guard';
 import { RequirePermission } from 'src/core/decorator/require-permission.decorator';
+import { ActualizarRutaDto } from './dto/update-ruta.dto';
 
 @Controller('ruta')
 export class RutaController {
@@ -33,5 +34,27 @@ export class RutaController {
     return this.rutaService.listar(req["user"]["id"]);
   }
 
-
+  @Patch(':id')
+  @UseGuards(
+    JwtAuthGuard,
+    PermissionsGuard,
+  )
+  @RequirePermission('RUTA_ASIGNAR')
+  editar(
+    @Param('id') id: string,
+    @Body() dto: ActualizarRutaDto,
+  ) {
+    return this.rutaService.editarRuta(id, dto);
+  }
+  @Get(':idRuta')
+  @UseGuards(
+    JwtAuthGuard,
+    PermissionsGuard,
+  )
+  @RequirePermission('RUTA_VER')
+  detalleRuta(
+    @Param('idRuta') idRuta: string,
+  ) {
+    return this.rutaService.listarClientesRutas(idRuta);
+  }
 }

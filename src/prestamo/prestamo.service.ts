@@ -123,6 +123,7 @@ export class PrestamoService {
                 dto.frecuencia,
               fechaInicio,
               fechaFin,
+              deudaActual:totalPagar,
               estado:
                 EstadoPrestamo.ACTIVO,
 
