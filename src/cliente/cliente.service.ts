@@ -3,6 +3,7 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 
@@ -16,6 +17,7 @@ import { EstadoUsuario, Usuario } from 'src/usuario/entities/usuario.entity';
 import { EstadoPrestamo } from 'src/prestamo/entities/prestamo.entity';
 import { UpdateClienteDto } from './dto/update-cliente.dto';
 import { Ruta } from 'src/ruta/entities/ruta.entity';
+import { log } from 'node:console';
 
 @Injectable()
 export class ClienteService {
@@ -352,8 +354,9 @@ export class ClienteService {
     Object.assign(cliente, dto);
 
     try {
-      const actualizado =
-        await this.clienteRepository.save(cliente);
+      console.log(cliente);
+
+      await this.clienteRepository.save(cliente);
 
       return {
         exito: true,
@@ -365,6 +368,47 @@ export class ClienteService {
     } catch (error) {
       throw new BadRequestException(
         'No se pudo actualizar el cliente',
+      );
+    }
+  }
+  async buscarClientes(texto?: string) {
+    try {
+      const termino = texto?.trim() ?? '';
+      log
+
+      if (!termino) {
+        return [];
+      }
+
+      const query = await this.clienteRepository
+        .createQueryBuilder('cliente')
+        .where(
+          `
+        LOWER(cliente.nombres) LIKE LOWER(:termino)
+        OR LOWER(cliente.apellidos) LIKE LOWER(:termino)
+        OR cliente.cedula LIKE :termino
+        OR LOWER(
+          CONCAT(cliente.nombres, ' ', cliente.apellidos)
+        ) LIKE LOWER(:termino)
+        `,
+          {
+            termino: `%${termino}%`,
+          },
+        )
+        .take(20)
+        .getMany();
+
+
+      return {
+        exito:true,
+        msg:"Operación exitosa.",
+        data:query
+      };
+    } catch (error) {
+      console.error('Error al buscar clientes:', error);
+
+      throw new InternalServerErrorException(
+        'Error al buscar los clientes',
       );
     }
   }
