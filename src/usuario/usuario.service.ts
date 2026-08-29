@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CrearAdminDto } from './dto/crear.admint.dto';
 import { DataSource } from 'typeorm';
 import { EstadoUsuario, Usuario } from './entities/usuario.entity';
@@ -262,6 +262,56 @@ export class UsuarioService {
     );
   }
 
+
+  async obtenerPorId(
+    id: string,
+    adminId: string,
+  ) {
+    try {
+      const usuario = await this.dataSource
+        .getRepository(Usuario)
+        .findOne({
+          where: {
+            id,
+            createdById: adminId,
+          },
+        });
+
+      if (!usuario) {
+        throw new NotFoundException(
+          'Usuario no encontrado.',
+        );
+      }
+
+      return {
+        exito: true,
+        msg: 'Operación exitosa.',
+        data: {
+          id: usuario.id,
+          nombre: usuario.nombre,
+          apellido: usuario.apellido,
+          documento: usuario.documento,
+          telefono: usuario.telefono,
+          email: usuario.email,
+          estado: usuario.estado,
+        },
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+
+      console.error(
+        'Error al obtener usuario por ID:',
+        error,
+      );
+
+      throw new BadRequestException(
+        'No se pudo obtener la información del usuario.',
+      );
+    }
+  }
+
   private obtenerMensajeDuplicateKey(error: any): string {
     const mensaje = error?.driverError?.message ?? error?.message ?? '';
 
@@ -279,6 +329,8 @@ export class UsuarioService {
 
     return 'Ya existe un registro con alguno de los datos proporcionados.';
   }
+
+
 }
 
 

@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Req,
   UseGuards,
@@ -50,6 +51,22 @@ export class UsuarioController {
     return this.usuarioService.obtenerPorRol(
       req["user"]["id"],
       'COBRADOR',
+    );
+  }
+
+  @Get('cobrador/:id')
+  @UseGuards(
+    JwtAuthGuard,
+    PermissionsGuard,
+  )
+  @RequirePermission('COBRADOR_VER')
+  async detalleCobrador(
+    @Req() req: Request,
+    @Param("id") id: string
+  ) {
+    return this.usuarioService.obtenerPorId(
+      id,
+      req["user"]["id"],
     );
   }
 }
