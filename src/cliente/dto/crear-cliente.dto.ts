@@ -44,4 +44,12 @@ export class CrearClienteDto {
   @IsString()
   @IsOptional()
   rutaId?: string;
+
+  @IsString()
+  @IsOptional()
+  barrio?: string;
+  
+  @IsString()
+  @IsOptional()
+  observacion?: string;
 }

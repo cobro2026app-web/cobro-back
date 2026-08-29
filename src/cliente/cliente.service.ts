@@ -14,6 +14,8 @@ import { Cliente } from './entities/cliente.entity';
 import { CrearClienteDto } from './dto/crear-cliente.dto';
 import { EstadoUsuario, Usuario } from 'src/usuario/entities/usuario.entity';
 import { EstadoPrestamo } from 'src/prestamo/entities/prestamo.entity';
+import { UpdateClienteDto } from './dto/update-cliente.dto';
+import { Ruta } from 'src/ruta/entities/ruta.entity';
 
 @Injectable()
 export class ClienteService {
@@ -25,6 +27,9 @@ export class ClienteService {
     @InjectRepository(Usuario)
     private readonly usuarioRepository:
       Repository<Usuario>,
+    @InjectRepository(Ruta)
+    private readonly rutaRepository:
+      Repository<Ruta>,
   ) { }
 
   async crear(
@@ -91,6 +96,8 @@ export class ClienteService {
           whatsapp: dto.whatsapp,
           rutaId: dto.rutaId,
           direccion: dto.direccion,
+          barrio: dto.barrio,
+          observacion: dto.observacion,
           descripcionDireccion:
             dto.descripcionDireccion,
           estado: EstadoUsuario.ACTIVO,
@@ -225,5 +232,140 @@ export class ClienteService {
         ),
       }))
     };
+  }
+
+  async clienteById(id: string) {
+    try {
+      const res = await this.clienteRepository.findOne({
+
+        where: { id }, relations: {
+
+          prestamos: true
+
+        },
+
+      });
+
+      return {
+        exito: true,
+        msg: "Operación éxitosa",
+        data: res,
+      }
+    } catch (error) {
+
+    }
+  }
+  async actualizar(
+    id: string,
+    dto: UpdateClienteDto,
+    usuarioId: string,
+  ) {
+    // 1. Obtener el usuario que realiza la modificación
+    const usuario = await this.usuarioRepository.findOne({
+      where: {
+        id: usuarioId,
+      },
+      relations: {
+        rol: true,
+      },
+    });
+
+    if (!usuario) {
+      throw new NotFoundException(
+        'Usuario no encontrado',
+      );
+    }
+
+    // 2. Determinar el administrador propietario
+    let adminId: string;
+
+    if (usuario.rol.codigo === 'ADMIN') {
+      adminId = usuario.id;
+    } else if (usuario.rol.codigo === 'COBRADOR') {
+      if (!usuario.createdById) {
+        throw new BadRequestException(
+          'El cobrador no tiene un administrador asignado',
+        );
+      }
+
+      adminId = usuario.createdById;
+    } else {
+      throw new ForbiddenException(
+        'El usuario no tiene permisos para actualizar clientes',
+      );
+    }
+
+    // 3. Buscar el cliente
+    const cliente = await this.clienteRepository.findOne({
+      where: {
+        id,
+        createdById: adminId,
+      },
+    });
+
+    if (!cliente) {
+      throw new NotFoundException(
+        'Cliente no encontrado',
+      );
+    }
+
+    // 4. Validar cédula si viene en la actualización
+    if (
+      dto.cedula &&
+      dto.cedula !== cliente.cedula
+    ) {
+      const existe =
+        await this.clienteRepository.findOne({
+          where: {
+            cedula: dto.cedula,
+          },
+        });
+
+      if (existe && existe.id !== cliente.id) {
+        throw new ConflictException(
+          'Ya existe un cliente con esta cédula',
+        );
+      }
+    }
+
+    // 5. Validar ruta si viene en la actualización
+    if (
+      dto.rutaId &&
+      dto.rutaId !== cliente.rutaId
+    ) {
+      const ruta = await this.rutaRepository.findOne({
+        where: {
+          id: dto.rutaId,
+          adminId,
+          habilitada: true,
+        },
+      });
+
+      if (!ruta) {
+        throw new BadRequestException(
+          'La ruta no existe, está deshabilitada o no pertenece al administrador',
+        );
+      }
+    }
+
+    // 6. Actualizar únicamente lo recibido
+    Object.assign(cliente, dto);
+
+    try {
+      const actualizado =
+        await this.clienteRepository.save(cliente);
+
+      return {
+        exito: true,
+        msg: 'Cliente actualizado correctamente',
+        data: {
+
+        },
+      };
+    } catch (error) {
+      throw new BadRequestException(
+        'No se pudo actualizar el cliente',
+      );
+    }
   }
 }

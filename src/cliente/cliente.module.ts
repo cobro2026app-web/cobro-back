@@ -7,12 +7,14 @@ import { ClienteService } from './cliente.service';
 
 import { PermisoModule } from 'src/permiso/permiso.module';
 import { Usuario } from 'src/usuario/entities/usuario.entity';
+import { Ruta } from 'src/ruta/entities/ruta.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       Cliente,
-      Usuario
+      Usuario,
+      Ruta
     ]),
 
     PermisoModule,

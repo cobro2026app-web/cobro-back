@@ -51,11 +51,11 @@ export class Cliente {
     descripcionDireccion!: string;
 
     @Column({
-  type: 'varchar',
-  length: 36,
-  nullable: true,
-})
-rutaId!: string | null;
+        type: 'varchar',
+        length: 36,
+        nullable: true,
+    })
+    rutaId!: string | null;
     @Column({
         default: 'ACTIVO',
     })
@@ -67,18 +67,30 @@ rutaId!: string | null;
     })
     createdById!: string;
 
+    @Column({
+        type: 'varchar',
+        length: 36,
+    })
+    barrio!: string;
+
+    @Column({
+        type: 'varchar',
+        length: 36,
+    })
+    observacion!: string;
+
     @CreateDateColumn()
     createdAt!: Date;
 
     @UpdateDateColumn()
     updatedAt!: Date;
 
-  /**
-   * Préstamos asociados al cliente.
-   */
-  @OneToMany(
-    () => Prestamo,
-    (prestamo) => prestamo.cliente,
-  )
-  prestamos!: Prestamo[];
+    /**
+     * Préstamos asociados al cliente.
+     */
+    @OneToMany(
+        () => Prestamo,
+        (prestamo) => prestamo.cliente,
+    )
+    prestamos!: Prestamo[];
 }
