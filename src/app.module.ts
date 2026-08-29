@@ -10,8 +10,8 @@ import { RolPermisoModule } from './rol-permiso/rol-permiso.module';
 import { ClienteModule } from './cliente/cliente.module';
 import { ConfiPrestamoModule } from './confi-prestamo/confi-prestamo.module';
 import { PrestamoModule } from './prestamo/prestamo.module';
-import { PagosModule } from './pagos/pagos.module';
 import { RutaModule } from './ruta/ruta.module';
+import { PagoModule } from './pago/pago.module';
 
 @Module({
   imports: [
@@ -26,8 +26,8 @@ import { RutaModule } from './ruta/ruta.module';
     ClienteModule,
     ConfiPrestamoModule,
     PrestamoModule,
-    PagosModule,
-    RutaModule
+    RutaModule,
+    PagoModule
 
   ],
 })
