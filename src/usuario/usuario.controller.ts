@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Req,
   UseGuards,
@@ -15,6 +16,7 @@ import { CrearCobradorDto } from './dto/crear-cobrador.dto';
 import { JwtAuthGuard } from 'src/core/guard/jwt-auth.guard';
 import { RequirePermission } from 'src/core/decorator/require-permission.decorator';
 import { PermissionsGuard } from 'src/core/guard/permissions.guard';
+import { EditarCobradorDto } from './dto/editar-cobrador.dto';
 
 @Controller('usuario')
 export class UsuarioController {
@@ -68,5 +70,18 @@ export class UsuarioController {
       id,
       req["user"]["id"],
     );
+  }
+
+  @Patch('cobrador/:id')
+  @UseGuards(
+    JwtAuthGuard,
+    PermissionsGuard,
+  )
+  @RequirePermission('COBRADOR_EDITAR')
+  editar(
+    @Param('id') id: string,
+    @Body() dto: EditarCobradorDto,
+  ) {
+    return this.usuarioService.editarCobradir(id, dto);
   }
 }

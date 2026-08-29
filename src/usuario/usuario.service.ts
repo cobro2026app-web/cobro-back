@@ -5,6 +5,7 @@ import { EstadoUsuario, Usuario } from './entities/usuario.entity';
 import { Rol } from 'src/rol/entities/rol.entity';
 import { CredencialService } from 'src/credencial/credencial.service';
 import { CrearCobradorDto } from './dto/crear-cobrador.dto';
+import { EditarCobradorDto } from './dto/editar-cobrador.dto';
 
 @Injectable()
 export class UsuarioService {
@@ -312,6 +313,75 @@ export class UsuarioService {
     }
   }
 
+
+  async editarCobradir(id: string, dto: EditarCobradorDto) {
+    try {
+      const cobrador = await this.dataSource
+        .getRepository(Usuario).findOne({
+          where: {
+            id,
+            rol: {
+              nombre: 'COBRADOR',
+            },
+          },
+          relations: {
+            rol: true,
+          },
+        });
+
+      if (!cobrador) {
+        throw new NotFoundException(
+          'El cobrador no existe',
+        );
+      }
+
+      // Validar documento
+      const documentoExiste = await this.dataSource
+        .getRepository(Usuario).findOne({
+          where: {
+            id: id,
+          },
+        });
+
+      if (
+        documentoExiste &&
+        documentoExiste.id !== id
+      ) {
+        throw new ConflictException(
+          'El documento ya está registrado',
+        );
+      }
+
+      // Actualizar datos
+      cobrador.nombre = dto.nombre;
+      cobrador.apellido = dto.apellido;
+      cobrador.telefono = dto.telefono;
+      cobrador.email = dto.email;
+
+      await this.dataSource
+        .getRepository(Usuario).save(cobrador);
+
+      return {
+        exito: true,
+        msg: 'Operación exitosa.',
+        data: {},
+      };
+    } catch (error) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ConflictException
+      ) {
+        throw error;
+      }
+
+      console.error(error);
+
+      throw new InternalServerErrorException(
+        'Error al actualizar el cobrador',
+      );
+    }
+  }
+
   private obtenerMensajeDuplicateKey(error: any): string {
     const mensaje = error?.driverError?.message ?? error?.message ?? '';
 
@@ -329,6 +399,8 @@ export class UsuarioService {
 
     return 'Ya existe un registro con alguno de los datos proporcionados.';
   }
+
+
 
 
 }
