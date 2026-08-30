@@ -12,6 +12,7 @@ import {
 import { Usuario } from 'src/usuario/entities/usuario.entity';
 import { PrestamoFechaPago } from './prestamo.fecha.pago.entity';
 import { Cliente } from 'src/cliente/entities/cliente.entity';
+import { Pago } from 'src/pago/entities/pago.entity';
 
 export enum FrecuenciaPrestamo {
   DIARIO = 'DIARIO',
@@ -81,6 +82,11 @@ export class Prestamo {
     type: 'int',
   })
   monto!: number;
+  
+  @Column({
+    type: 'int',
+  })
+  deudaActual!: number;
 
   @Column({
     type: 'int',
@@ -170,4 +176,10 @@ export class Prestamo {
     (fechaPago) => fechaPago.prestamo,
   )
   fechasPago!: PrestamoFechaPago[];
+
+  @OneToMany(
+  () => Pago,
+  (pago) => pago.prestamo,
+)
+pagos!: Pago[];
 }

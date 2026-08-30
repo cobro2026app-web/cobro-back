@@ -39,6 +39,16 @@ export class PrestamoController {
 
     );
   }
+  @Get(":id")
+  @UseGuards(
+    JwtAuthGuard,
+    PermissionsGuard,
+  )
+  @RequirePermission('PRESTAMO_VER')
+  detalle(@Param("id") id: string
+  ) {
+    return this.prestamoService.detallePrestamo(id);
+  }
 
 
 

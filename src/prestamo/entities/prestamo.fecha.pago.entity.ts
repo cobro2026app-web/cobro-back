@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 
 import { Prestamo } from './prestamo.entity';
-import { Pago } from 'src/pagos/entities/pago.entity';
+import { Pago } from 'src/pago/entities/pago.entity';
 
 @Entity('prestamo_fechas_pago')
 export class PrestamoFechaPago {
@@ -78,7 +78,7 @@ export class PrestamoFechaPago {
      */
     @OneToMany(
         () => Pago,
-        (pago) => pago.fechaPagoProgramada,
+        (pago) => pago.id,
     )
     pagos!: Pago[];
 }

@@ -123,6 +123,7 @@ export class PrestamoService {
                 dto.frecuencia,
               fechaInicio,
               fechaFin,
+              deudaActual: totalPagar,
               estado:
                 EstadoPrestamo.ACTIVO,
 
@@ -183,14 +184,14 @@ export class PrestamoService {
           },
           relations: {
             fechasPago: true,
-            cliente:true
+            cliente: true
           },
-          select:{
-            cliente:{
-              id:true,
-              nombres:true,
-              apellidos:true,
-              cedula:true,
+          select: {
+            cliente: {
+              id: true,
+              nombres: true,
+              apellidos: true,
+              cedula: true,
             }
           },
           order: {
@@ -227,5 +228,30 @@ export class PrestamoService {
       month - 1,
       day,
     );
+  }
+
+  async detallePrestamo(id: string) {
+
+    try {
+      const prestamos = await this.dataSource
+        .getRepository(Prestamo).findOne({
+          where: { id },
+          relations: {
+            pagos: true,
+            fechasPago: true,
+            cliente:true
+          },
+
+        });
+      return {
+        exito: true,
+        msg: "Operación exitosa.",
+        data: prestamos
+      }
+    } catch (error) {
+      console.log("error al consultar detalle de prestamo", error);
+
+
+    }
   }
 }
