@@ -7,7 +7,8 @@ import {
 
 export class CrearPagoDto {
   @IsUUID()
-  prestamoId!: string;
+  prestamoId?: string;
+  
   @IsUUID()
   cobradorId!: string;
 

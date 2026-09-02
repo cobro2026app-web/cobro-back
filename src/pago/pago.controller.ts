@@ -5,6 +5,7 @@ import { RequirePermission } from 'src/core/decorator/require-permission.decorat
 import { PermissionsGuard } from 'src/core/guard/permissions.guard';
 import { JwtAuthGuard } from 'src/core/guard/jwt-auth.guard';
 import { ReversarPagoDto } from './dto/reversar-pago-dto';
+import { HistoricoPagoDto } from './dto/historico-pago.dto';
 
 @Controller('pago')
 export class PagoController {
@@ -55,6 +56,19 @@ export class PagoController {
   ) {
 
     return this.pagoService.listarPagos(id);
+  }
 
+  @Post('historico')
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @RequirePermission('PRESTAMO_CREAR')
+  async crearPrestamoHistorico(
+    @Body() dto: HistoricoPagoDto,
+    @Req() req: Request,
+  ) {
+
+    return this.pagoService.crearPrestamoHistorico(
+      dto,
+      req["user"]["id"],
+    );
   }
 }

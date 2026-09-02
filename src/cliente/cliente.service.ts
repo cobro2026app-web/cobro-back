@@ -108,11 +108,14 @@ export class ClienteService {
 
         });
 
-      await this.clienteRepository.save(cliente);
+      const save = await this.clienteRepository.save(cliente);
 
       return {
         exito: true,
         msg: 'Cliente creado correctamente.',
+        data:{
+          id:save.id
+        }
       };
 
     } catch (error) {

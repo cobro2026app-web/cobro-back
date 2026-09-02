@@ -97,6 +97,12 @@ export class Pago {
     nullable: true,
   })
   fechaReversion!: Date | null;
+  @Column({
+    name: 'fecha_pago',
+    type: 'datetime',
+    nullable: true,
+  })
+  fechaPago!: Date | null;
 
   @Column({
     name: 'usuario_reversion_id',

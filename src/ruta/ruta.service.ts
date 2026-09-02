@@ -71,6 +71,7 @@ export class RutaService {
         habilitada: dto.habilitada ?? true,
         adminId,
         cobradorId,
+        capital:dto.capital
       });
 
       const rutaGuardada =
@@ -152,6 +153,7 @@ export class RutaService {
           nombre: ruta.nombre,
           descripcion: ruta.descripcion,
           habilitada: ruta.habilitada,
+          capital:ruta.capital,
           cobrador,
           cantidadClientes: clientes,
           createdAt: ruta.createdAt,

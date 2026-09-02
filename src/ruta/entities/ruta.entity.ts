@@ -32,6 +32,11 @@ export class Ruta {
 
   // Cobrador actualmente asignado
   @Column({
+    type: 'int',
+  })
+  capital!: number | null;
+
+  @Column({
     type: 'varchar',
     length: 36,
     nullable: true,

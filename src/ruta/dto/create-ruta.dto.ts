@@ -1,6 +1,8 @@
 import {
   IsBoolean,
   IsOptional,
+  IsPositive,
+  isPositive,
   IsString,
   IsUUID,
   MaxLength,
@@ -16,6 +18,12 @@ export class CrearRutaDto {
   @IsString()
   @MaxLength(255)
   descripcion?: string;
+
+  @IsOptional()
+  @IsPositive()
+  @MaxLength(255)
+  capital!: number;
+  
 
   @IsOptional()
   @IsUUID()
