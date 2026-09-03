@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Caja } from "src/caja/entities/caja.entity";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity('rutas')
 export class Ruta {
@@ -48,4 +49,7 @@ export class Ruta {
 
   @UpdateDateColumn()
   updatedAt!: Date;
+
+  @OneToMany(() => Caja, caja => caja.ruta)
+cajas?: Caja[];
 }

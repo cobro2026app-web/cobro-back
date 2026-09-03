@@ -12,6 +12,7 @@ import { ConfiPrestamoModule } from './confi-prestamo/confi-prestamo.module';
 import { PrestamoModule } from './prestamo/prestamo.module';
 import { RutaModule } from './ruta/ruta.module';
 import { PagoModule } from './pago/pago.module';
+import { CajaModule } from './caja/caja.module';
 
 @Module({
   imports: [
@@ -27,7 +28,8 @@ import { PagoModule } from './pago/pago.module';
     ConfiPrestamoModule,
     PrestamoModule,
     RutaModule,
-    PagoModule
+    PagoModule,
+    CajaModule
 
   ],
 })

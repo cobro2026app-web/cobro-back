@@ -109,6 +109,9 @@ export class RutaService {
       order: {
         nombre: 'ASC',
       },
+      relations:{
+        cajas:true
+      }
     });
 
 
@@ -155,6 +158,8 @@ export class RutaService {
           habilitada: ruta.habilitada,
           capital:ruta.capital,
           cobrador,
+          
+          cajas:ruta.cajas,
           cantidadClientes: clientes,
           createdAt: ruta.createdAt,
           updatedAt: ruta.updatedAt,
